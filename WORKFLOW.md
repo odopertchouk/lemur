@@ -5,16 +5,16 @@
   ## Each developer creates feature branches from integration
   git checkout integration
   git pull origin integration
-  git checkout -b feature/my-feature
+  git checkout -b feature/<feature branch>
 
   ## Work, commit, push feature branch
-  git push origin feature/my-feature
+  git push origin feature/<feature branch>
 
   ## Create PR: feature/my-feature → integration (on your fork)
-
+  gh pr create --base integration --head oleg/<feature branch>
   ## Integration Branch Maintenance:
 
-  ### Periodically sync with Netflix
+  ### Periodically sync with Netflix 
   git checkout integration
   git fetch upstream
   git merge upstream/main
