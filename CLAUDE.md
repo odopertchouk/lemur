@@ -48,3 +48,5 @@ Note: Use the "no_minify" commands if you encounter CSS minification errors with
 - NEVER add Claude Code signatures or Co-Authored-By lines to commits
 - Keep commit messages clean and focused on the technical change
 - Use conventional commit format when appropriate
+- We work on Netflix version of Lemur in our own fork
+
