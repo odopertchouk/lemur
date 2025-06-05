@@ -127,7 +127,7 @@ gulp.task('dev:styles', function () {
     })))
     .pipe(plumber())
     .pipe(concat('styles.css'))
-    .pipe(minifycss())
+    .pipe(csso())
     .pipe(autoprefixer('last 1 version'))
     .pipe(gulp.dest('.tmp/styles'))
     .pipe(size());

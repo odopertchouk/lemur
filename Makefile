@@ -132,4 +132,10 @@ checkout-pr:
 	git fetch upstream pull/$(pr)/head:pr-$(pr)
 
 
-.PHONY: develop dev-postgres dev-docs setup-git build clean update-submodules test testloop test-cli test-js test-python lint lint-python lint-js coverage publish release
+run-be:
+	lemur -c config/lemur.conf.py start -b 0.0.0.0:8000
+
+run-fe:
+	node_modules/.bin/gulp serve
+
+.PHONY: develop dev-postgres dev-docs setup-git build clean update-submodules test testloop test-cli test-js test-python lint lint-python lint-js coverage publish release run-be run-fe

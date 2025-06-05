@@ -58,10 +58,13 @@ def create_app(app_name=None, blueprints=None, config=None):
     ctx = get_current_context(silent=True)
 
     # get config option value from command line
+    # Fix for AttributeError: 'ScriptInfo' object has no attribute 'config'
+    # Use getattr with default None to handle cases where script_info doesn't have config attribute
+    # This prevents crashes when starting the server via lemur serve command
     if ctx and config is None:
         script_info = ctx.obj
         if script_info:
-            config = getattr(script_info, 'config')
+            config = getattr(script_info, 'config', None)
 
     configure_app(app, config)
     configure_blueprints(app, blueprints)
@@ -258,7 +261,14 @@ def install_plugins(app):
     from lemur.plugins import plugins
     from lemur.plugins.base import register
 
-    for ep in entry_points().get("lemur.plugins", []):
+    try:
+        # For newer versions of importlib.metadata (Python 3.10+)
+        eps = entry_points(group="lemur.plugins")
+    except TypeError:
+        # Fallback for older versions
+        eps = entry_points().get("lemur.plugins", [])
+    
+    for ep in eps:  
         try:
             plugin = ep.load()
         except Exception:
