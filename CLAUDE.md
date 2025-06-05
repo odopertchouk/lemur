@@ -50,3 +50,29 @@ Note: Use the "no_minify" commands if you encounter CSS minification errors with
 - Use conventional commit format when appropriate
 - We work on Netflix version of Lemur in our own fork
 
+ ## Each developer creates feature branches from integration
+  git checkout integration
+  git pull origin integration
+  git checkout -b oleg/my-feature
+
+### Work, commit, push feature branch
+#### When done with the change check that necessary all files are staged and tracked
+  git status 
+#### verify that all changes in the branch are as expcetd
+  git diff
+  git diff --staged
+  ...if necessary:
+  git add <changed files>
+
+#### Commit changes
+  git commit -m "Title of commit" -m " - line 1" -m " - line 2" ...
+  git push origin oleg/my-feature
+
+## GitHub PR Commands
+- Create a PR: `gh pr create --base integration --head oleg/my-feature`
+
+## Development Workflow Guidance
+- Make sure you are on a new branch, and the branch is synced with `integration` branch before starting a new feature
+
+## Security
+- Do not commit changes to config/... as they may contain passwords and other secrets

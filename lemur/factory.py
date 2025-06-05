@@ -267,8 +267,8 @@ def install_plugins(app):
     except TypeError:
         # Fallback for older versions
         eps = entry_points().get("lemur.plugins", [])
-    
-    for ep in eps:  
+
+    for ep in eps:
         try:
             plugin = ep.load()
         except Exception:

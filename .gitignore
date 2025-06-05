@@ -47,3 +47,5 @@ migrations/
 .DS_Store
 .vscode/
 .npmrc
+lemur.log*
+logs/
