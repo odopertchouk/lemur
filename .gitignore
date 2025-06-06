@@ -49,3 +49,4 @@ migrations/
 .npmrc
 lemur.log*
 logs/
+.claude/
