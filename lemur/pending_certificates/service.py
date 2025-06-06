@@ -13,7 +13,7 @@ from lemur.authorities.models import Authority
 from lemur.certificates import service as certificate_service
 from lemur.certificates.schemas import CertificateUploadInputSchema
 from lemur.common import validators
-from lemur.common.utils import truthiness, parse_cert_chain, parse_certificate
+from lemur.common.utils import truthiness, parse_cert_chain, parse_certificate, db_retry
 from lemur.destinations.models import Destination
 from lemur.domains.models import Domain
 from lemur.extensions import metrics
@@ -66,6 +66,7 @@ def delete_by_id(id):
     delete(get(id))
 
 
+@db_retry(max_retries=3, delay=1, backoff=2)
 def get_unresolved_pending_certs():
     """
     Retrieve a list of unresolved pending certs given a list of ids

@@ -13,6 +13,8 @@ import secrets
 import socket
 import ssl
 import string
+import time
+from functools import wraps
 
 import OpenSSL
 import josepy as jose
@@ -25,9 +27,11 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, pkcs7
+from flask import current_app
 from flask_restful.reqparse import RequestParser
 from sqlalchemy import and_, func
 from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy.exc import ResourceClosedError, DisconnectionError, OperationalError
 
 from lemur.constants import CERTIFICATE_KEY_TYPES
 from lemur.exceptions import InvalidConfiguration
@@ -41,6 +45,47 @@ paginated_parser.add_argument("sortDir", type=str, dest="sort_dir", location="ar
 paginated_parser.add_argument("sortBy", type=str, dest="sort_by", location="args")
 paginated_parser.add_argument("filter", type=str, location="args")
 paginated_parser.add_argument("owner", type=str, location="args")
+
+
+def db_retry(max_retries=3, delay=1, backoff=2):
+    """
+    Decorator to retry database operations on connection failures
+
+    :param max_retries: Maximum number of retry attempts
+    :param delay: Initial delay between retries in seconds
+    :param backoff: Multiplier for delay on each retry
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            current_delay = delay
+
+            while attempts < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except (ResourceClosedError, DisconnectionError, OperationalError) as e:
+                    attempts += 1
+                    if attempts >= max_retries:
+                        current_app.logger.error(f"Database retry failed after {max_retries} attempts: {e}")
+                        raise e
+
+                    current_app.logger.warning(f"Database connection issue (attempt {attempts}/{max_retries}): {e}")
+                    current_app.logger.info(f"Retrying in {current_delay} seconds...")
+                    time.sleep(current_delay)
+                    current_delay *= backoff
+
+                    # Reset database session on connection errors
+                    try:
+                        from lemur.extensions import db
+                        db.session.rollback()
+                        db.session.close()
+                    except Exception:
+                        pass
+
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def base64encode(string):
