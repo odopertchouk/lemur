@@ -58,7 +58,7 @@ Note: Use the "no_minify" commands if you encounter CSS minification errors with
   # Use:
   function my_function('a', count=1, file=d)
   ```
-- Use Flask module-level logging: `current_app.logger`
+- **Use `current_app.logger` whenever possible**
 - Document all functions and classes with docstrings
 - Add inline comments for complex logic only
 - Use double quotes (") for strings unless there's a conflict
